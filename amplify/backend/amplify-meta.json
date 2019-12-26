@@ -1,0 +1,71 @@
+{
+	"providers": {
+		"awscloudformation": {
+			"AuthRoleName": "rnserverappsync-ascendenv-20190625173328-authRole",
+			"UnauthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-ascendenv-20190625173328-unauthRole",
+			"AuthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-ascendenv-20190625173328-authRole",
+			"Region": "us-east-1",
+			"DeploymentBucketName": "rnserverappsync-ascendenv-20190625173328-deployment",
+			"UnauthRoleName": "rnserverappsync-ascendenv-20190625173328-unauthRole",
+			"StackName": "rnserverappsync-ascendenv-20190625173328",
+			"StackId": "arn:aws:cloudformation:us-east-1:623295365631:stack/rnserverappsync-ascendenv-20190625173328/dd9c8ce0-9790-11e9-a31e-0e366af4fd90"
+		}
+	},
+	"api": {},
+	"storage": {
+		"Notes": {
+			"service": "DynamoDB",
+			"providerPlugin": "awscloudformation",
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/rnserverappsync-ascendenv-20190625173328-deployment/amplify-cfn-templates/storage/Notes-cloudformation-template.json",
+				"logicalId": "storageNotes"
+			},
+			"lastPushTimeStamp": "2019-07-24T22:01:26.735Z",
+			"output": {
+				"PartitionKeyName": "NoteId",
+				"Region": "us-east-1",
+				"Arn": "arn:aws:dynamodb:us-east-1:623295365631:table/Notes-ascendenv",
+				"PartitionKeyType": "S",
+				"Name": "Notes-ascendenv"
+			},
+			"lastPushDirHash": "uKYTwWSRYWXnIDUpD0kiIe1G2nY="
+		}
+	},
+	"function": {},
+	"auth": {
+		"asenduser": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation",
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/rnserverappsync-ascendenv-20190625173328-deployment/amplify-cfn-templates/auth/asenduser-cloudformation-template.yml",
+				"logicalId": "authasenduser"
+			},
+			"lastPushTimeStamp": "2019-07-24T22:01:26.742Z",
+			"output": {
+				"AppClientSecret": "qkaggndu49quui083gltic3vtshbmtnaqmh16fcse1es4v8ikfu",
+				"UserPoolId": "us-east-1_3mQ4e7p9c",
+				"AppClientIDWeb": "5dh6sbbbgljjh3jk3vrqv49h2o",
+				"AppClientID": "2dhno41hr7uikliunudpn6e641",
+				"UserPoolName": "asenduserpool"
+			},
+			"lastPushDirHash": "MUVrL+TRkerx7W2FCtYTtAlgVQA="
+		}
+	},
+	"analytics": {
+		"asendpinpoint": {
+			"service": "Pinpoint",
+			"providerPlugin": "awscloudformation",
+			"providerMetadata": {
+				"s3TemplateURL": "https://s3.amazonaws.com/rnserverappsync-ascendenv-20190625173328-deployment/amplify-cfn-templates/analytics/pinpoint-cloudformation-template.json",
+				"logicalId": "analyticsasendpinpoint"
+			},
+			"lastPushTimeStamp": "2019-07-24T22:01:26.740Z",
+			"output": {
+				"appName": "asendpinpoint-ascendenv",
+				"Region": "us-east-1",
+				"Id": "d7b7b51dc96847fe8a86a42e6410dc39"
+			},
+			"lastPushDirHash": "gtpaiOe7syrdqbMr4c7h5TaXZAk="
+		}
+	}
+}

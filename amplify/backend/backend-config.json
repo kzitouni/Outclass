@@ -1,0 +1,22 @@
+{
+	"api": {},
+	"storage": {
+		"Notes": {
+			"service": "DynamoDB",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"function": {},
+	"auth": {
+		"asenduser": {
+			"service": "Cognito",
+			"providerPlugin": "awscloudformation"
+		}
+	},
+	"analytics": {
+		"asendpinpoint": {
+			"service": "Pinpoint",
+			"providerPlugin": "awscloudformation"
+		}
+	}
+}

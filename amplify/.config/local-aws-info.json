@@ -1,0 +1,17 @@
+{
+    "devv": {
+        "configLevel": "project",
+        "useProfile": true,
+        "profileName": "us-east-2-demo-user"
+    },
+    "dataenviro": {
+        "configLevel": "project",
+        "useProfile": true,
+        "profileName": "Profile1"
+    },
+    "ascendenv": {
+        "configLevel": "project",
+        "useProfile": true,
+        "profileName": "default"
+    }
+}

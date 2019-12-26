@@ -1,0 +1,34 @@
+{
+    "paths": [
+        {
+            "name": "/Notes",
+            "lambdaFunction": "NotesCRUD",
+            "privacy": {
+                "open": true
+            }
+        }
+    ],
+    "resourceName": "NotesCRUD",
+    "apiName": "NotesCRUD",
+    "functionArns": [
+        {
+            "lambdaFunction": "NotesCRUD"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "rnserverappsync-devv-20190520003501-authRole",
+        "unAuthRoleName": "rnserverappsync-devv-20190520003501-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "NotesCRUD",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ]
+}

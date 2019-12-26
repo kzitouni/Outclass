@@ -1,0 +1,35 @@
+{
+  "expo": {
+    "name": "Asend",
+    "description": "A platform where college students can check what classes are open or closed.",
+    "slug": "Asend",
+    "privacy": "public",
+    "sdkVersion": "34.0.0",
+    "platforms": [
+      "ios",
+      "android"
+    ],
+    "version": "1.1.8",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#44aafc"
+    },
+    "updates": {
+      "fallbackToCacheTimeout": 0
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.app.Asend"
+    },
+    "android": {
+      "package": "com.app.Asend",
+      "versionCode": 11
+    }
+  }
+}

@@ -1,0 +1,53 @@
+{
+    "devv": {
+        "awscloudformation": {
+            "AuthRoleName": "rnserverappsync-devv-20190520003501-authRole",
+            "UnauthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-devv-20190520003501-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-devv-20190520003501-authRole",
+            "Region": "us-east-2",
+            "DeploymentBucketName": "rnserverappsync-devv-20190520003501-deployment",
+            "UnauthRoleName": "rnserverappsync-devv-20190520003501-unauthRole",
+            "StackName": "rnserverappsync-devv-20190520003501",
+            "StackId": "arn:aws:cloudformation:us-east-2:623295365631:stack/rnserverappsync-devv-20190520003501/a22585d0-7ab8-11e9-a12f-0a768148c3d2"
+        },
+        "categories": {
+            "auth": {
+                "rnserverappsyncde292522": {}
+            }
+        }
+    },
+    "dataenviro": {
+        "awscloudformation": {
+            "AuthRoleName": "rnserverappsync-dataenviro-20190601024202-authRole",
+            "UnauthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-dataenviro-20190601024202-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-dataenviro-20190601024202-authRole",
+            "Region": "us-east-2",
+            "DeploymentBucketName": "rnserverappsync-dataenviro-20190601024202-deployment",
+            "UnauthRoleName": "rnserverappsync-dataenviro-20190601024202-unauthRole",
+            "StackName": "rnserverappsync-dataenviro-20190601024202",
+            "StackId": "arn:aws:cloudformation:us-east-2:623295365631:stack/rnserverappsync-dataenviro-20190601024202/5c8a3ff0-8438-11e9-87fd-0626229bfdda"
+        },
+        "categories": {
+            "auth": {
+                "rnserverappsyncde292522": {}
+            }
+        }
+    },
+    "ascendenv": {
+        "awscloudformation": {
+            "AuthRoleName": "rnserverappsync-ascendenv-20190625173328-authRole",
+            "UnauthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-ascendenv-20190625173328-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::623295365631:role/rnserverappsync-ascendenv-20190625173328-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "rnserverappsync-ascendenv-20190625173328-deployment",
+            "UnauthRoleName": "rnserverappsync-ascendenv-20190625173328-unauthRole",
+            "StackName": "rnserverappsync-ascendenv-20190625173328",
+            "StackId": "arn:aws:cloudformation:us-east-1:623295365631:stack/rnserverappsync-ascendenv-20190625173328/dd9c8ce0-9790-11e9-a31e-0e366af4fd90"
+        },
+        "categories": {
+            "auth": {
+                "asenduser": {}
+            }
+        }
+    }
+}
