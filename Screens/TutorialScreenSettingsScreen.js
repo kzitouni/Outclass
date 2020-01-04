@@ -1,5 +1,5 @@
-import React, {Component} from 'react';
-import { StyleSheet, View, Text, AsyncStorage, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import { StyleSheet, AsyncStorage, ActivityIndicator } from 'react-native';
 import {Container} from 'native-base';
 import AppIntroSlider from 'react-native-app-intro-slider';
 
@@ -37,44 +37,36 @@ const slides = [
   }
 ];
 
-export default class TutorialScreenSettingsScreen extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      showRealApp: false,
-      loading: false,
-      //To show the main page of the app
-    };
-  }
-
+export default TutorialScreenSettingsScreen = (props) => {
   
+  const [showRealApp, setShowRealApp] = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  _onDone = () => {
+  const _onDone = () => {
     // After user finished the intro slides. Show real app through
     // navigation or simply by controlling state
     AsyncStorage.setItem('first_time', 'true').then(() => {
-      this.setState({ showRealApp: true });
-        this.props.navigation.navigate('Buy');
+      setShowRealApp(true)
+      props.navigation.navigate('Buy');
     });
   };
     
-  _onSkip = () => {
+  const _onSkip = () => {
     // After user skip the intro slides. Show real app through
     // navigation or simply by controlling state
     AsyncStorage.setItem('first_time', 'true').then(() => {
-      this.setState({ showRealApp: true });
-        this.props.navigation.navigate('Buy');
+      setShowRealApp(true)
+      props.navigation.navigate('Buy');
     });
   };
 
-  render() {
-    if (this.state.loading) return <ActivityIndicator size="large" />
+    if (loading) return <ActivityIndicator size="large" />
 
     //If false show the Intro Slides
-    if (this.state.showRealApp) {
+    if (showRealApp) {
       //Real Application
       return (
-      this.props.navigation.navigate('Buy')
+      props.navigation.navigate('Buy')
       );
     } else {
       //Intro slides
@@ -83,17 +75,15 @@ export default class TutorialScreenSettingsScreen extends Component {
           <AppIntroSlider
             slides={slides}
             //comming from the JsonArray below
-            onDone={this._onDone}
+            onDone={() =>_onDone()}
             //Handler for the done On last slide
             showSkipButton={false}
-            onSkip={this._onSkip}
+            onSkip={() => _onSkip()}
             showPrevButton={false}
-            
             doneLabel="Done"
           />
         </Container>
       );
     }
-  }
 }
 

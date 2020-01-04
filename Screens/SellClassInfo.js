@@ -1,21 +1,12 @@
-import React, { Component } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  Button,
-  Slider,
-  StyleSheet,
-  NavigatorIOS,
   Text,
   View,
   TouchableOpacity,
-  Modal,
-  TouchableHighlight,
   Alert,
   TextInput,
   Dimensions,
-  Picker,
-  Block,
-  FlatList,
   ScrollView,
   KeyboardAvoidingView,
 } from 'react-native';
@@ -23,7 +14,6 @@ import DropdownAlert from 'react-native-dropdownalert';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { API, graphqlOperation, Analytics } from 'aws-amplify';
 // import t from 'tcomb-form-native';
-import gql from 'graphql-tag';
 const { width: WIDTH } = Dimensions.get('window');
 
 const LowPrices = `query ListSortPice($CIndex: String)
@@ -139,7 +129,6 @@ const rem = entireScreenWidth / 380;
 EStyleSheet.build({ $rem: rem });
 var cogid;
 var cindex;
-var cognito;
 var price;
 var sortprice;
 var usernetido;
@@ -147,8 +136,11 @@ var passnetido;
 var custid;
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
-export default class SellClassInfo extends Component {
-  static navigationOptions = ({ navigation }) => {
+
+
+
+  const SellClassInfo = (props) => {
+  const navigationOptions = ({ navigation }) => {
     const { params = {} } = navigation.state;
     return {
       title: params.classname,
@@ -163,82 +155,77 @@ export default class SellClassInfo extends Component {
       headerBackTitle: 'Back',
     };
   };
-  state = {
-    Price: '',
-    SortPrice: ' ',
-    classstat: '',
-    classindexnum: this.props.navigation.state.params.classindex,
-    logins: [],
-    sellstatus: [],
-    notsell: [],
-    unsell: [],
-    lowprice: [],
-    lowprices: [],
-    content: false,
-    soldlist: false,
-    status: [],
-    classprice: [],
-    yourclassprice: [],
-    isVisible: false,
-    highoff: [],
-    offercog: [],
-    custi: custid,
-    soldprice:[],
-    soldprices:[],
-  };
-  SellClass = async () => {
+  const [Price, setPrice] = useState('')
+  const [SortPrice, setSortPrice] = useState(' ')
+  const [classindexnum, setClassindexnum] = useState(props.navigation.state.params.classindex)
+  const [logins, setLogins] = useState([])
+  const [sellstatus, setSellstatus] = useState([])
+  const [notsell, setNotsell] = useState([])
+  const [unsell, setUnsell] = useState([])
+  const [lowprice, setLowprice] = useState([])
+  const [lowprices, setLowprices] = useState([])
+  const [content, setContent] = useState(false)
+  const [soldlist, setSoldlist] = useState(false)
+  const [status, setStatus] = useState([])
+  const [classprice, setClassprice] = useState([])
+  const [yourclassprice, setYourclassprice] = useState([])
+  const [isVisible, setIsVisible] = useState(false)
+  const [highoff, setHighoff] = useState([])
+  const [offercog, setOffercog] = useState([])
+  const [custi, setCusti] = useState(custid)
+  const [soldprice, setSoldprice] = useState([])
+  const [soldprices, setSoldprices] = useState([])
+
+  const SellClass = async () => {
     try {
       const SellClass = await API.graphql(
         graphqlOperation(sellClass, {
-          classindexnum: this.props.navigation.state.params.classindex,
-          Price: this.state.Price,
-          userNetID: this.props.navigation.state.params.user
+          classindexnum: props.navigation.state.params.classindex,
+          Price: Price,
+          userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({ SellClass: SellClass.data.SellClass });
+      // this.setState({ SellClass: SellClass.data.SellClass });
       const status = await API.graphql(
         graphqlOperation(statcheck, {
-          Type: this.props.navigation.state.params.classindex,
-          userNetID: this.props.navigation.state.params.user
+          Type: props.navigation.state.params.classindex,
+          userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({ status: status.data.listLoginModals.items });
+      setStatus(status.data.listLoginModals.items)
       const lowprice = await API.graphql(
         graphqlOperation(lowestprice, {
-          CIndex: this.props.navigation.state.params.classindex,
+          CIndex: props.navigation.state.params.classindex,
         })
       );
-      this.setState({ lowprice: lowprice.data.listlowestprice.items });
+      setLowprice(lowprice.data.listlowestprice.items)
       const lowprices = await API.graphql(
         graphqlOperation(LowPrices, {
-          CIndex: this.props.navigation.state.params.classindex,
+          CIndex: props.navigation.state.params.classindex,
         })
       );
-      this.setState({ lowprices: lowprices.data.listlowestprice.items });
+      setLowprices(lowprices.data.listlowestprice.items)
       const yourclassprice = await API.graphql(
         graphqlOperation(classprice, {
-          Type: this.props.navigation.state.params.classindex,
-          userNetID: this.props.navigation.state.params.user
+          Type: props.navigation.state.params.classindex,
+          userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({
-        yourclassprice: yourclassprice.data.listLoginModals.items,
-      });
-      this.dropDownAlertRef.alertWithType(
+        setYourclassprice(yourclassprice.data.listLoginModals.items)
+      dropDownAlertRef.alertWithType(
         'success',
         'Success',
         'Class Succesfully Listed'
       );
     } catch (err) {
-      console.log('error creating restaurant...', err);
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
         'Listing not made. Please try again'
       );
     }
   };
-  offeraccept = async () => {
+  const offeraccept = async () => {
     try {
       const offer = await API.graphql(
         graphqlOperation(acceptoffer, {
@@ -248,19 +235,18 @@ export default class SellClassInfo extends Component {
           passO: passnetido,
           Price: price,
           SortPrice: sortprice,
-          pkey: this.props.navigation.state.params.classindex + '.O',
+          pkey: props.navigation.state.params.classindex + '.O',
           customerid: custid,  
-          userNetID: this.props.navigation.state.params.user
+          userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({ offer: offer.data.listLoginModals });
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'success',
         'Success',
         'Transaction may take between 3-5 minutes'
       )
     } catch (Error) {
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
         Error.errors[0].message
@@ -268,67 +254,57 @@ export default class SellClassInfo extends Component {
       console.log('error creating restaurant...', Error);
     }
   };
-  cognitoinfo = async () => {
-    try {
-      const offercog = await API.graphql(
-        graphqlOperation(coginfo, {
-          cognitoid: cogid,
-        })
-      );
-      this.setState({ offercog: offercog.data.getcoginfo.items });
-    } catch (Error) {
-      console.log('error creating restaurant...', Error);
-    }
-  };
-  acceptofferbut() {
-    this.cognitoinfo();
-    this.highestoff();
-    this.offeraccept();
+  // const cognitoinfo = async () => {
+  //   try {
+  //     const offercog = await API.graphql(
+  //       graphqlOperation(coginfo, {
+  //         cognitoid: cogid,
+  //       })
+  //     );
+  //     setOffercog(offercog.data.getcoginfo.items)
+  //   } catch (Error) {
+  //     console.log('error creating restaurant...', Error);
+  //   }
+  // };
+  const acceptofferbut = () => {
+   highestoff();
+   offeraccept();
   }
-  highestoff = async () => {
+  const highestoff = async () => {
     try {
       const highoff = await API.graphql(
         graphqlOperation(highestoffer, {
-          CognitoID: this.props.navigation.state.params.classindex,
+          CognitoID: props.navigation.state.params.classindex,
         })
       );
-      this.setState({ highoff: highoff.data.listhighestoffer.items });
+      setHighoff(highoff.data.listhighestoffer.items)
     } catch (Error) {
       console.log('error creating restaurant...', Error);
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
         Error.errors[0].message
       );
     }
   };
-  deleteLoginModal = async () => {
-    // const { classindexnum, SortPrice } = this.state;
-    // if (classindexnum === '') return;
-    // let notsell = { classindexnum };
-    // if (SortPrice !== '') {
-    //   notsell = { ...notsell, SortPrice };
-    // }
-    // const notsellarray = [...this.state.unsell, notsell];
-    // this.setState({ unsell: notsellarray });
+  const deleteLoginModal = async () => {
     try {
-      await API.graphql(graphqlOperation(unsellClass, {classindexnum: this.state.classindexnum,SortPrice: this.state.SortPrice, userNetID: this.props.navigation.state.params.user  }));
-      console.log('item created!');
+      await API.graphql(graphqlOperation(unsellClass, {classindexnum: classindexnum,SortPrice: SortPrice, userNetID: props.navigation.state.params.user  }));
       const status = await API.graphql(
         graphqlOperation(statcheck, {
-          Type: this.props.navigation.state.params.classindex,
-          userNetID: this.props.navigation.state.params.user
+          Type: props.navigation.state.params.classindex,
+          userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({ status: status.data.listLoginModals.items });
-      this.dropDownAlertRef.alertWithType(
+      setStatus(status.data.listLoginModals.items)
+      dropDownAlertRef.alertWithType(
         'success',
         'Success',
         'Class Succesfully Unlisted'
       );
     } catch (err) {
       console.log('error creating login...', err);
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
         'Listing did not delete. Please try again.'
@@ -336,99 +312,92 @@ export default class SellClassInfo extends Component {
     }
   };
 
-  onChange = (key, value) => {
-    this.setState({ [key]: value });
+  const onChange = (key, value) => {
+    setPrice(value)
   };
 
-  componentHideAndShow = () => {
-    this.setState(previousState => ({ content: !previousState.content }));
+  const componentHideAndShow = () => {
+    setContent(prevState => !prevState.content)
   };
-  componentHideAndShowsold = () => {
-    this.setState(previousState => ({ soldlist: !previousState.soldlist }));
+  const componentHideAndShowsold = () => {
+    setSoldlist(prevState => !prevState.soldlist)
   };
-  componentWillMount() {
-    this.lowprice();
-    this.status();
-    this.lowprices();
-    this.soldprices();
-    this.cognitoinfo();
-    this.highestoff();
-    this.props.navigation.getParam({ classname: 'classname' });
+  useEffect(() => {
+    lowpricee()
+    Getstatus()
+    Getlowprices()
+    Getsoldprices()
+    highestoff()
+    props.navigation.getParam({ classname: 'classname' });
+    // props.navigation.addListener('willFocus', status)
+    // props.navigation.addListener('willFocus', lowprice)
+    // willFocusSubscription = props.navigation.addListener(
+    //   'willFocus',
+    //   status
+    // );
+  }, [])
 
-    //this.cognitoinfo();
-    // this.highestoffer();
-    this.props.navigation.addListener('willFocus', this.status);
-    this.props.navigation.addListener('willFocus', this.lowprice);
-    Analytics.record(this.props.navigation.state.params.classindex + 'sell')
-    this.willFocusSubscription = this.props.navigation.addListener(
-      'willFocus',
-      this.status,  Analytics.record(this.props.navigation.state.params.classindex + 'sell')
-
-    );
-  }
-  lowprice = async () => {
+  const lowpricee = async () => {
     try {
       const lowprice = await API.graphql(
         graphqlOperation(lowestprice, {
-          CIndex: this.props.navigation.state.params.classindex,
+          CIndex: props.navigation.state.params.classindex,
         })
       );
-      this.setState({ lowprice: lowprice.data.listlowestprice.items });
+      setLowprice(lowprice.data.listlowestprice.items)
       const yourclassprice = await API.graphql(
         graphqlOperation(classprice, {
-          Type: this.props.navigation.state.params.classindex, userNetID: this.props.navigation.state.params.user
+          Type: props.navigation.state.params.classindex, userNetID: props.navigation.state.params.user
         })
       );
-      this.setState({
-        yourclassprice: yourclassprice.data.listLoginModals.items,
-      });
+      setYourclassprice(yourclassprice.data.listLoginModals.items)
       console.log(yourclassprice.data);
     } catch (err) {
       console.log('error creating restaurant...', err);
     }
   };
-  status = async () => {
+  const Getstatus = async () => {
     try {
       const status = await API.graphql(
         graphqlOperation(statcheck, {
-          Type: this.props.navigation.state.params.classindex,
-          userNetID: this.props.navigation.state.params.user
+          Type: props.navigation.state.params.classindex,
+          userNetID: props.navigation.state.params.user
         })
-      );
-      this.setState({ status: status.data.listLoginModals.items });
+      ); 
+      setStatus(status.data.listLoginModals.items)
     } catch (err) {
       console.log('error creating restaurant...', err);
     }
   };
-  unlistFunction() {
-    this.deleteLoginModal();
-    this.lowprice();
-    this.lowprices();
+ const unlistFunction = () => {
+    deleteLoginModal();
+    lowpricee();
+    Getlowprices();
   }
-  listFunction() {
-    this.SellClass();
+  const listFunction = () => {
+    SellClass();
   }
-  setModalVisible(visible) {
-    this.setState({ isVisible: visible });
+  const setModalVisible = (visible) => {
+    setIsVisible(visible)
   }
-  soldprices = async () => {
+  const Getsoldprices = async () => {
     try {
       const soldprices = await API.graphql(
-        graphqlOperation(soldprice, {CognitoID: this.props.navigation.state.params.classindex})
+        graphqlOperation(soldprice, {CognitoID: props.navigation.state.params.classindex})
       );
-      this.setState({ soldprices: soldprices.data.getsoldclass.items });
+      setSoldprices(soldprices.data.getsoldclass.items)
     } catch (err) { 
       console.log('error creating restaurant...', err);
     }
   };
-  lowprices = async () => {
+  const Getlowprices = async () => {
     try {
       const lowprices = await API.graphql(
         graphqlOperation(LowPrices, {
-          CIndex: this.props.navigation.state.params.classindex,
+          CIndex: props.navigation.state.params.classindex,
         })
       );
-      this.setState({ lowprices: lowprices.data.listlowestprice.items });
+      setLowprices(lowprices.data.listlowestprice.items)
     } catch (err) {
       console.log('error creating restaurant...', err);
     }
@@ -459,31 +428,28 @@ export default class SellClassInfo extends Component {
   //   }
   // }
 
-  render() {
-    const { navigation } = this.props;
-    const classname = navigation.getParam('classname', ' ');
-    var classindex = navigation.getParam('classindex', ' ');
-    const classnum = navigation.getParam('classnum', ' ');
-    const classtime = navigation.getParam('classtime', ' ');
-    const classmajor = navigation.getParam('classmajor', ' ');
-    const classstat = navigation.getParam('classstat', ' ');
-    const highoffer = navigation.getParam('highoffer', ' ');
-    const lowestprice = navigation.getParam('lowestprice', ' ');
-    const section = navigation.getParam('section', ' ');
-    const user = navigation.getParam('user', ' ');
+    const classname = props.navigation.getParam('classname', ' ');
+    var classindex = props.navigation.getParam('classindex', ' ');
+    const classnum = props.navigation.getParam('classnum', ' ');
+    const classtime = props.navigation.getParam('classtime', ' ');
+    const classmajor = props.navigation.getParam('classmajor', ' ');
+    const classstat = props.navigation.getParam('classstat', ' ');
+    const highoffer = props.navigation.getParam('highoffer', ' ');
+    const lowestprice = props.navigation.getParam('lowestprice', ' ');
+    const section = props.navigation.getParam('section', ' ');
+    const user = props.navigation.getParam('user', ' ');
 
-    {
-      this.state.highoff.map((dak, index) => (
-        <View key={index}>
-          {(cogid = dak.Type)} {(cindex = dak.OIndex)}
-          {(price = dak.Price)} 
-          {(cognito = dak.CognitoID)}
-          {(sortprice = dak.SortPrice)}
-          {(custid = dak.customerid)}
-          {(usernetido = dak.userNetID)} {(passnetido = dak.passNetID)}
-        </View>
-      ));
-    }
+    //  highoff.map((dak, index) => (
+    //     <View key={index}>
+    //       {(cogid = dak.Type)} {(cindex = dak.OIndex)}
+    //       {(price = dak.Price)} 
+    //       {(cognito = dak.CognitoID)}
+    //       {(sortprice = dak.SortPrice)}
+    //       {(custid = dak.customerid)}
+    //       {(usernetido = dak.userNetID)} {(passnetido = dak.passNetID)}
+    //     </View>
+    //   ));
+    
 
     return (
       <KeyboardAvoidingView behavior="position" enabled>
@@ -499,13 +465,13 @@ export default class SellClassInfo extends Component {
                     Your Price:
                   </Text>
                   <View>
-                    {this.state.yourclassprice.map(dak => (
+                    {yourclassprice.map(dak => (
                       <View item={dak} key={dak.id}>
                         <Text style={styles.yourPriceTxt}>${dak.Price}</Text>
                       </View>
                     ))}
                   </View>
-                  <Text> {this.state.classprice.Price}</Text>
+                  <Text> {classprice.Price}</Text>
                 </View>
                 <View style={styles.infoCont}>
                   <Text style={styles.infoTxtM}>Class ID :</Text>
@@ -547,7 +513,7 @@ export default class SellClassInfo extends Component {
                           highoffer == '-' ||
                           typeof highoffer == undefined
                         }
-                        onPress={() => this.setModalVisible(true)}>
+                        onPress={() => setModalVisible(true)}>
                         <View style={styles.offerGrey}> 
                           <Text style={styles.offerATxt}>Accept Offer</Text>
                         </View>
@@ -558,8 +524,8 @@ export default class SellClassInfo extends Component {
                        onPress={() => Alert.alert(
                           'Tap Yes to accept offer',
                           ' ', // <- this part is optional, you can pass an empty string
-                          [{text: 'Cancel', onPress: () => this.props.navigation.navigate('SellClassInfo')},
-                            {text: 'Yes', onPress: () => this.acceptofferbut()},
+                          [{text: 'Cancel', onPress: () => props.navigation.navigate('SellClassInfo')},
+                            {text: 'Yes', onPress: () => acceptofferbut()},
                             
                           ],
                           {cancelable: true},
@@ -590,7 +556,7 @@ export default class SellClassInfo extends Component {
                     </View>
 
                     <View style={styles.listContP}>
-                      {this.state.lowprice.map(dak => (
+                      {lowprice.map(dak => (
                         <View item={dak} key={dak.id}>
                           <Text style={styles.listTxt}>${dak.Price}</Text>
                         </View>
@@ -605,7 +571,7 @@ export default class SellClassInfo extends Component {
                     />
 
                     <View>
-                      <TouchableOpacity onPress={this.componentHideAndShow}>
+                      <TouchableOpacity onPress={componentHideAndShow}>
                         <View style={styles.viewCont}>
                           <Text style={styles.viewAll}>View All</Text>
                         </View>
@@ -616,9 +582,9 @@ export default class SellClassInfo extends Component {
               </View>
             </View>
 
-            {this.state.lowprices.map(dak => (
+            {lowprices.map(dak => (
               <View item={dak} key={dak.id}>
-                {this.state.content ? (
+                {content ? (
                   <View style={{ width: '100%', backgroundColor: 'white' }}>
                     <Text style={styles.priceTxt}>
                       ${dak.Price}
@@ -628,7 +594,7 @@ export default class SellClassInfo extends Component {
               </View>
             ))}
 
-            {this.state.status.map(dake => (
+            {status.map(dake => (
               <View item={dake} key={dake.id}>
                 {dake.stat === 'false' || dake.stat === null ? (
                   <View>
@@ -674,17 +640,17 @@ export default class SellClassInfo extends Component {
                         }}>
                         <TouchableOpacity
                           onPress={() => {
-                            this.listFunction();
+                            listFunction();
                           }}
                           style={styles.buyButton}
                           disabled={
-                            this.state.Price.length === 0 ||
-                            this.state.Price == null ||
-                            typeof this.state.Price == undefined ||
-                            this.state.Price == ' ' ||
-                            this.state.Price == '' ||
-                            this.state.Price == '0' ||
-                            this.state.Price < 5
+                            Price.length === 0 ||
+                            Price == null ||
+                            typeof Price == undefined ||
+                            Price == ' ' ||
+                            Price == '' ||
+                            Price == '0' ||
+                            Price < 5
                           }>
                           <View>
                             <Text style={styles.buyTxt}>List</Text>
@@ -710,7 +676,7 @@ export default class SellClassInfo extends Component {
                             <View style={styles.underLineT}/>
                             <View>
                               <TouchableOpacity
-                                onPress={this.componentHideAndShowsold}>
+                                onPress={() => componentHideAndShowsold()}>
                                 <View style={styles.viewCont}>
                                   <Text style={styles.viewAll}>View All</Text>
                                 </View>
@@ -721,9 +687,9 @@ export default class SellClassInfo extends Component {
                       </View>
                     </View>
                     
-                    {this.state.soldprices.map(daks => (
+                    {soldprices.map(daks => (
               <View item={daks} key={daks.id}> 
-                {this.state.soldlist ? (
+                {soldlist ? (
                   <View style={{ width: '100%', backgroundColor: 'white' }}>
                     <Text style={styles.priceTxt}>
                       ${daks.Price}
@@ -753,7 +719,7 @@ export default class SellClassInfo extends Component {
                             <View style={styles.underLineT}/>
                             <View>
                               <TouchableOpacity
-                                onPress={this.componentHideAndShowsold}>
+                                onPress={() => componentHideAndShowsold()}>
                                 <View style={styles.viewCont}>
                                   <Text style={styles.viewAll}>View All</Text>
                                 </View>
@@ -763,9 +729,9 @@ export default class SellClassInfo extends Component {
                         </View>
                       </View>
                     </View>
-                    {this.state.soldprices.map(dak => (
+                    {soldprices.map(dak => (
                       <View item={dak} key={dak.id}>
-                        {this.state.soldlist ? (
+                        {soldlist ? (
                           <View
                          style={{ width: '100%', backgroundColor: 'white' }}>
                           <Text style={styles.soldClassesPriceTxt}> 
@@ -777,7 +743,7 @@ export default class SellClassInfo extends Component {
                     ))}
                     <TouchableOpacity
                       onPress={() => {
-                        this.unlistFunction();
+                        unlistFunction();
                       }}
                       style={styles.unlistbuyButton}>
                       <View>
@@ -792,12 +758,12 @@ export default class SellClassInfo extends Component {
             <View style={styles.empty} />
           </ScrollView>
         </View>
-        <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        <DropdownAlert ref={ref => (dropDownAlertRef = ref)} />
       </KeyboardAvoidingView>
     );
   }
-}
 
+export default SellClassInfo
 const styles = EStyleSheet.create({
   soldClassesPriceTxt: {
      fontSize: "20rem", 

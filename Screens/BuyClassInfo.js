@@ -15,7 +15,7 @@ import {
 } from "react-native";
 import Expo from "expo";
 import Icon from "react-native-vector-icons/Ionicons";
-import { API, graphqlOperation, Analytics } from "aws-amplify";
+import { API, graphqlOperation } from "aws-amplify";
 import Stripe from "react-native-stripe-api";
 import { TextInputMask } from "react-native-masked-text";
 import EStyleSheet from "react-native-extended-stylesheet";
@@ -23,10 +23,7 @@ const entireScreenWidth = Dimensions.get("window").width;
 const rem = entireScreenWidth / 380;
 EStyleSheet.build({ $rem: rem });
 import DropdownAlert from "react-native-dropdownalert";
-var tokeni;
 var price;
-var useridO;
-var passO;
 var cognitoid;
 var sortprice;
 const lowest = `query ListSortPrice($CIndex:String)
@@ -102,13 +99,10 @@ export default BuyClassInfo = (props) => {
   const [modalVisible1, setModalVisible1] = useState(false);
   const [useridO, setUseridO] = useState("");
   const [passO, setPassO] = useState("");
-  const [login, setLogin] = useState([]);
-  const [logins, setLogins] = useState([]);
   const [lowprices, setLowprices] = useState([]);
   const [trans, setTrans] = useState([]);
   const [modalVisible2, setModalVisible2] = useState(false);
   const [modalVisible3, setModalVisible3] = useState(false);
-  const [content, setContent] = useState(false);
   const [buybutton, setBuybutton] = useState(false);
   const [Price, setPrice] = useState("");
   const [tokeni, setTokeni] = useState("");
@@ -131,7 +125,7 @@ export default BuyClassInfo = (props) => {
     setButtenabled1(false)
   };
 
-  componentHideAndShow = () => {
+  const componentHideAndShow = () => {
     setBuybutton(prevState => !prevState)
   };
 
@@ -163,12 +157,11 @@ export default BuyClassInfo = (props) => {
     passData();
     setModalVisible(false);
   };
-  useEffect(async () => {
+
+  const Getlowprice = async () => {
     try {
       console.log(tokeni);
       setUser( await AsyncStorage.getItem("userNetID") )
-      Analytics.record({ indext: props.navigation.state.params.index });
-      Analytics.record(props.navigation.state.params.index);
 
       const lowprices = await API.graphql(
         graphqlOperation(lowest, {
@@ -189,6 +182,9 @@ export default BuyClassInfo = (props) => {
     } catch (err) {
       console.log("error creating restaurant...", err);
     }
+  }
+  useEffect( () => {
+Getlowprice()
   }, []);
 
   const payme = () => {
@@ -228,15 +224,15 @@ export default BuyClassInfo = (props) => {
       dropDownAlertRef.alertWithType("error", "Error", Error.errors[0].message);
     }
   };
-  const stripetok = async () => {
-    try {
-      const getstripe = await API.graphql(graphqlOperation(stripe));
-      setGetstripe(getstripe.data.getStripetoken.items)
-    } catch (Error) {
-      console.log("error creating restaurant...", Error);
-      dropDownAlertRef.alertWithType("error", "Error", Error.errors[0].message);
-    }
-  };
+  // const stripetok = async () => {
+  //   try {
+  //     const getstripe = await API.graphql(graphqlOperation(stripe));
+  //     setGetstripe(getstripe.data.getStripetoken.items)
+  //   } catch (Error) {
+  //     console.log("error creating restaurant...", Error);
+  //     dropDownAlertRef.alertWithType("error", "Error", Error.errors[0].message);
+  //   }
+  // };
 
   const yourFunction = () => {
     payme();
@@ -265,26 +261,26 @@ export default BuyClassInfo = (props) => {
   const day5 = navigation.getParam("day5", " ");
   const classmajor = navigation.getParam("classmajor", " ");
   const classnum = navigation.getParam("classnum", " ");
-  {
-    highoff.map((info, index) => (
-      <View key={index}>{(info.Price)}</View>
-    ));
-  }
-  {
-    lowprices.map((info, index) => (
-      <View key={index}>
-        {(price = info.Price)} {(useridO = info.userNetID)}
-        {(passO = info.passNetID)}
-        {(cognitoid = info.CognitoID)}
-        {(sortprice = info.SortPrice)}
-      </View>
-    ));
-  }
-  {
-    getstripe.map((info, index) => (
-      <View key={index}>{(token = info.Token)}</View>
-    ));
-  }
+  // {
+  //   highoff.map((info, index) => (
+  //     <View key={index}>{(info.Price)}</View>
+  //   ));
+  // }
+  // {
+  //   lowprices.map((info, index) => (
+  //     <View key={index}>
+  //       {(price = info.Price)} {(useridO = info.userNetID)}
+  //       {(passO = info.passNetID)}
+  //       {(cognitoid = info.CognitoID)}
+  //       {(sortprice = info.SortPrice)}
+  //     </View>
+  //   ));
+  // }
+  // {
+  //   getstripe.map((info, index) => (
+  //     <View key={index}>{(token = info.Token)}</View>
+  //   ));
+  // }
   return (
     <View style={styles.background}>
       <Modal
@@ -1394,7 +1390,7 @@ const styles = EStyleSheet.create({
   confM: {
     flexDirection: "column",
     marginTop: "10rem",
-    height: "50%",
+    height: "60%",
     width: "100%",
     backgroundColor: "#ffffff",
     borderTopWidth: "0.5rem",

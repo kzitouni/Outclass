@@ -99,21 +99,32 @@ const errorget = `query errorget($userNetID: String){getError(filter:{Type:{cont
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
 var classind;
+navigationOptions = ({ navigation }) => {
+  const { params = {} } = navigation.state;
+  return {
+    title: "Your Schedule",
 
+    headerStyle: {
+      backgroundColor: "#44aafc"
+    },
+    headerTintColor: "white",
+    headerTitleStyle: {
+      fontWeight: "bold",
+      fontSize: 20
+    },
+    headerBackTitle: "Back"
+  };
+};
 var price;
 const entireScreenWidth = Dimensions.get("window").width;
 const rem = entireScreenWidth / 380;
 EStyleSheet.build({ $rem: rem });
 const SchedScreen = props => {
-    //const [schedinfo, setSchedinfo] = useState([])
-//   const [lowprices, setLowprices] = useState([]);
   const [ind, setInd] = useState("");
   const [price, setPrice] = useState(price);
-
   const [text, setText] = useState([]);
   const [All, setAlll] = useState([]);
   const [youroffers, setYouroffers] = useState([]);
-  // const [offers, setOffers] = useState([])
   const [isVisible, setIsVisible] = useState(false);
   const [version, setVersion] = useState([]);
   const [isVisible1, setIsVisible1] = useState(false);
@@ -122,22 +133,22 @@ const SchedScreen = props => {
   const [errormes, setErrormes] = useState([]);
   const [message, setMessage] = useState(false);
 
-  const navigationOptions = ({ navigation }) => {
-    const { params = {} } = navigation.state;
-    return {
-      title: "Your Schedule",
+  // navigationOptions = ({ navigation }) => {
+  //   const { params = {} } = navigation.state;
+  //   return {
+  //     title: "Your Schedule",
 
-      headerStyle: {
-        backgroundColor: "#44aafc"
-      },
-      headerTintColor: "white",
-      headerTitleStyle: {
-        fontWeight: "bold",
-        fontSize: 20
-      },
-      headerBackTitle: "Back"
-    };
-  };
+  //     headerStyle: {
+  //       backgroundColor: "#44aafc"
+  //     },
+  //     headerTintColor: "white",
+  //     headerTitleStyle: {
+  //       fontWeight: "bold",
+  //       fontSize: 20
+  //     },
+  //     headerBackTitle: "Back"
+  //   };
+  // };
   const queryData = async () => {
     try {
       const netidcheck = await API.graphql(graphqlOperation(netidCheck));
@@ -206,9 +217,6 @@ const SchedScreen = props => {
         All.push(Comb);
         Comb = [];
       }
-
-      console.log("All Donzos", All);
-
       return All;
     } catch (err) {
       dropDownAlertRef.alertWithType("error", "Error", err.errors[0].message);
@@ -382,8 +390,8 @@ const SchedScreen = props => {
   console.log(ind);
   return (
     <View style={styles.background}>
-      {version.map(info => (
-        <View>
+      {version.map((info, i) => (
+        <View key={i}>
           <Text>
             {appversion < info.android
               ? props.navigation.navigate("UpdateApp")
@@ -409,8 +417,8 @@ const SchedScreen = props => {
                 Are you sure you want to delete your offer?
               </Text>
             </View>
-            {youroffers.map(dats => (
-              <View style={styles.modcontclose}>
+            {youroffers.map((dats, i) => (
+              <View style={styles.modcontclose} key={i}>
                 <TouchableOpacity onPress={() => setModalVisible(false)}>
                   <View style={styles.modcancelview}>
                     <Text style={{ textAlign: "left" }}>Cancel</Text>
@@ -440,13 +448,13 @@ const SchedScreen = props => {
           <View style={styles.container}>
             <View style={styles.youroffercont}>
               <Text style={styles.falltxt}>Fall 2019 </Text>
-              {errormes.map(dake =>
+              {errormes.map((dake, i) =>
                 dake.Statuse == " " ||
                 dake.Statuse == null ||
                 typeof dake.Statuse == undefined ? (
-                  <Text style={styles.falltxtL}> </Text>
+                  <Text style={styles.falltxtL} key={i}> </Text>
                 ) : dake.Statuse == "Pending" ? (
-                  <Text style={styles.falltxtL}>Status: Pending</Text>
+                  <Text style={styles.falltxtL} key={i}>Status: Pending</Text>
                 ) : (
                   Alert.alert(
                     dake.Statuse,
@@ -479,8 +487,8 @@ const SchedScreen = props => {
           </View>
           {text}
 
-          {All.map(dat => (
-            <View item={dat} key={dat.id}>
+          {All.map((dat, i) => (
+            <View item={dat} key={i}>
               <View style={styles.schedbox}>
                 <Modal
                   transparent={true}
@@ -588,8 +596,8 @@ const SchedScreen = props => {
             <Text style={styles.yourofferstxt}>Your Offers</Text>
           </View>
           <View>
-            {youroffers.map(da => (
-              <View item={da} key={da.id}>
+            {youroffers.map((da, i) => (
+              <View item={da} key={i}>
                 <View style={styles.schedbox}>
                   <View style={styles.ordercont}>
                     <View style={styles.checkcont}>

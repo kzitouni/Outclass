@@ -1,5 +1,5 @@
-import React, {Component, useState, useEffect} from 'react';
-import { StyleSheet, View, Text, AsyncStorage, ActivityIndicator, TouchableOpacity, Image } from 'react-native';
+import React, { useState } from 'react';
+import {  AsyncStorage, ActivityIndicator} from 'react-native';
 import {Container} from 'native-base';
 import AppIntroSlider from 'react-native-app-intro-slider';
 import EStyleSheet from 'react-native-extended-stylesheet';
@@ -129,7 +129,7 @@ if (loading) return <ActivityIndicator size="large" />
             onDone={_onDone}
             //Handler for the done On last slide
             showSkipButton={false}
-            onSkip={this._onSkip}
+            onSkip={() => _onSkip()}
             showPrevButton={false}
             
             doneLabel="Done"

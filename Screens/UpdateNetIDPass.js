@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from "react";
 import {
   View,
   Dimensions,
@@ -6,13 +6,13 @@ import {
   Keyboard,
   Text,
   TouchableOpacity,
-  TextInput,
-} from 'react-native';
-import { API, graphqlOperation } from 'aws-amplify';
-import EStyleSheet from 'react-native-extended-stylesheet';
-const entireScreenWidth = Dimensions.get('window').width;
+  TextInput
+} from "react-native";
+import { API, graphqlOperation } from "aws-amplify";
+import EStyleSheet from "react-native-extended-stylesheet";
+const entireScreenWidth = Dimensions.get("window").width;
 const rem = entireScreenWidth / 380;
-import DropdownAlert from 'react-native-dropdownalert';
+import DropdownAlert from "react-native-dropdownalert";
 EStyleSheet.build({ $rem: rem });
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
@@ -39,170 +39,134 @@ const netid = `query Checketid($userNetID: String){
   }
 }`;
 
-export default class UpdateNetIDpass extends Component {
+export default UpdateNetIDpass = props => {
+  const [passNetID, setPassNetID] = useState("");
+  const [netID, setNetID] = useState([]);
 
-  rerender = () => this.forceUpdate();
+  useEffect(() => {
+    GetnetID();
+  }, []);
 
-  state = {
-    NetID: '',
-    passNetID: '',
-    userNetID: '',
-    Name: '',
-    Password: '',
-    Terms: '',
-    logins: '',
-    names: [],
-    netID: [],
-  };
-  componentWillMount() {
-    this.netID();
-  }
-  netID = async () => {
+  const GetnetID = async () => {
     try {
-      const netID = await API.graphql(graphqlOperation(netid, {userNetID: this.props.navigation.state.params.use}));
-      this.setState({ netID: netID.data.listLoginModals.items });
+      const netID = await API.graphql(
+        graphqlOperation(netid, {
+          userNetID: props.navigation.state.params.use
+        })
+      );
+      setNetID(netID.data.listLoginModals.items);
     } catch (err) {
-      console.log('error creating restaurant...', err);
+      console.log("error creating restaurant...", err);
     }
   };
-  Passupdate = async () => {
+  const Passupdate = async () => {
     try {
-      await API.graphql(graphqlOperation(updatepass, {passNetID: this.state.passNetID, userNetID: this.props.navigation.state.params.use}));
-      console.log('item created!');
-      this.dropDownAlertRef.alertWithType(
-        'success',
-        'Success',
-        'Class Succesfully Listed'
+      await API.graphql(
+        graphqlOperation(updatepass, {
+          passNetID: passNetID,
+          userNetID: props.navigation.state.params.use
+        })
+      );
+      console.log("item created!");
+      dropDownAlertRef.alertWithType(
+        "success",
+        "Success",
+        "Class Succesfully Listed"
       );
     } catch (err) {
-      console.log('error creating login...', err);
-       this.dropDownAlertRef.alertWithType(
-        'error',
-        'Error',
-        err.errors[0].message
-      );
+      console.log("error creating login...", err);
+      dropDownAlertRef.alertWithType("error", "Error", err.errors[0].message);
     }
   };
-
-  // change state then user types into input
-  onChange = (key, value) => {
-    this.setState({ [key]: value });
-  };
-
-  // onClickab(){
-  //   this.props.navigation.navigate('HomeScreen');
-  //   this.CreateUser();
-  // }
-  //   async componentDidMount() {
-  //     const names = await API.graphql(graphqlOperation(getLoginModal, {NetID: this.state.userNetID, Password: this.state.passNetID}));
-  //     this.setState({
-  //       names: names.data.getLoginModal.items
-  //     })
-  //   } catch (err) {
-  //     console.log('error fetching names...', err)
-  //   }
-
-  render() {
-    const { navigation } = this.props;
-    const use = navigation.getParam('use', ' ');
-    return (
-      <DismissKeyboard>
+  return (
+    <DismissKeyboard>
       <View>
         <View style={styles.container}>
-          <Text
-            style={styles.enterpasstxt}>
-            {' '}
-            Enter Your New Password{' '}
-          </Text>
-          <View
-            style={styles.netcont}> 
-            {this.state.netID.map(dat => (
-              <View item={dat} key={dat.id}>
+          <Text style={styles.enterpasstxt}> Enter Your New Password </Text>
+          <View style={styles.netcont}>
+            {netID.map((dat, ind) => (
+              <View item={dat} key={ind}>
                 <Text style={styles.netIdTxt}>NetID: {dat.userNetID}</Text>
               </View>
             ))}
           </View>
           <View style={styles.txtinputcont}>
             <TextInput
-              placeholder="Enter your Password"  
+              placeholder="Enter your Password"
               style={styles.txtinputstyle}
-              onChangeText={v => this.onChange('passNetID', v)}
-              value={this.state.passNetID}
+              onChangeText={v => setPassNetID(v)}
+              value={passNetID}
             />
           </View>
           <View style={styles.buttoncont}>
-          <TouchableOpacity style={styles.button} onPress={()=> this.Passupdate()}>
-            <Text style={styles.buttontext}>Update</Text> 
-          </TouchableOpacity>
-</View> 
-          {/* {this.state.data.map((dat, index)=>(
-        <Text
-          key={index}>{dat.UserID}
-        </Text>
-                )) } */}
-                </View>
-     <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+            <TouchableOpacity
+              style={styles.button}
+              onPress={() => Passupdate()}
+            >
+              <Text style={styles.buttontext}>Update</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-      </DismissKeyboard>
-    );
-  }
-}
+        <DropdownAlert ref={ref => (dropDownAlertRef = ref)} />
+      </View>
+    </DismissKeyboard>
+  );
+};
 
 const styles = EStyleSheet.create({
   container: {
-    justifyContent: 'center',
+    justifyContent: "center",
     marginTop: "50rem",
     padding: "20rem",
-    backgroundColor: '#ffffff',
+    backgroundColor: "#ffffff"
   },
   button: {
-    marginTop: '30rem',
-    height: '50rem',
-    width: '90%',
-    backgroundColor: 'orange',
+    marginTop: "30rem",
+    height: "50rem",
+    width: "90%",
+    backgroundColor: "orange",
     //backgroundColor: '#44aafc',
-    borderRadius: '5rem',
-    alignItems: 'center',
-    justifyContent: 'center',
+    borderRadius: "5rem",
+    alignItems: "center",
+    justifyContent: "center"
   },
   buttontext: {
-    fontSize: '20rem',
-    textAlign: 'center',
-    color: 'white',
-    fontWeight: '500',
+    fontSize: "20rem",
+    textAlign: "center",
+    color: "white",
+    fontWeight: "500"
   },
   netIdTxt: {
     fontSize: "16rem",
-    fontWeight: 'bold',
-    color: 'black',
+    fontWeight: "bold",
+    color: "black"
   },
   txtinputstyle: {
- width: '50%',   
-  height: "50rem", 
-   margin: "10rem",
-  backgroundColor: '#ffffff', 
-   borderRadius: "5rem",
-   borderWidth: "1rem",
-    borderColor: '#D3D3D3',
-    padding:"10rem"
+    width: "50%",
+    height: "50rem",
+    margin: "10rem",
+    backgroundColor: "#ffffff",
+    borderRadius: "5rem",
+    borderWidth: "1rem",
+    borderColor: "#D3D3D3",
+    padding: "10rem"
   },
-  netcont:{
-   justifyContent: 'center',
-  flexDirection: 'row',
-   marginBottom: '2%',
-   marginTop:'10%'
-            },
-  enterpasstxt:{
-   justifyContent: 'center',
-   textAlign:'center',
-     flexDirection: 'row',
-     marginBottom: '2%',
-     fontSize:"20rem" 
+  netcont: {
+    justifyContent: "center",
+    flexDirection: "row",
+    marginBottom: "2%",
+    marginTop: "10%"
   },
-  buttoncont:{justifyContent:'center', 
-  alignItems:'center'},
-  txtinputcont:{
-justifyContent: 'center', 
-flexDirection: 'row'
+  enterpasstxt: {
+    justifyContent: "center",
+    textAlign: "center",
+    flexDirection: "row",
+    marginBottom: "2%",
+    fontSize: "20rem"
+  },
+  buttoncont: { justifyContent: "center", alignItems: "center" },
+  txtinputcont: {
+    justifyContent: "center",
+    flexDirection: "row"
   }
 });

@@ -1,4 +1,4 @@
-import React, { Component, useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FlatList,
   Text,
@@ -9,13 +9,12 @@ import {
   Dimensions,
   RefreshControl,
 } from 'react-native';
-import Amplify, { Analytics } from 'aws-amplify';
+import Amplify from 'aws-amplify';
 import {
   Collapse,
   CollapseHeader,
   CollapseBody,
 } from 'accordion-collapse-react-native';
-import { Ionicons } from '@expo/vector-icons';
 import { API, graphqlOperation } from 'aws-amplify';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import aws_exports from './aws_exports';
@@ -27,369 +26,113 @@ EStyleSheet.build({ $rem: rem });
 const extractKey = ({ SectM }) => SectM;
 Text.defaultProps = Text.defaultProps || {};
 Text.defaultProps.allowFontScaling = false;
-const lowest = `query ListSortPrice($CIndex:String)
-{listlowestprice
-  (CIndex:$CIndex, limit:1)
-  {
-  items{
-    Price
-  }
-}}`;
 
-var indi;
-var getPrice;
+export default BuyClassSections = (props) => {
+  const [data, setData] = useState([])
 
-const BuyClassSections = (props) => {
-const [data, setData] = useState([])
-const [SectM, setSectM] = useState([])
-const [lowprices, setLowprices] = useState([])
-const [ind, setInd] = useState(indi)
+  useEffect(() => {
+    GetfetchData();
+  }, [])
 
-useEffect(() => {
-  fetchData();
-  Lowprice();
-  Analytics.record({majort: props.navigation.state.params.major})
-  Analytics.record(props.navigation.state.params.major)
-})
-const recordfunc = () => {
-  Analytics.record(props.navigation.state.params.major)
-}
-const Lowprice = async () => {
-  try {
-    const lowprice = await API.graphql(
-      graphqlOperation(lowest, {
-        CIndex: getPrice,
-      })
-    );
-    setLowprices(lowprice.data.listlowestprice.items)
-  } catch (err) {
-    console.log('error creating ', err);
-  }
-};
-
-const fetchData = async () => {
-  var i = null;
-
-  try {
-    const response = await fetch(
-      `https://rutgersnmajors.s3.amazonaws.com/Major${
-        props.navigation.state.params.major
-      }.json`
-    );
-    const json = await response.json();
-    setData(json)
-    var Full = [];
-    var j = 0;
-    for (i = 0; i < json.length; i++) {
-      for (j = 0; j < json[i].SectM.length; j++) {
-        Full.push(json[i].SectM[j].Index);
-      }
-    }
-    var SectMN = [];
-    var Comb = [];
-    var n = 0;
-    var Fin = [];
-
-    for (i = 0; i < json.length; i++) {
-      for (j = 0; j < json[i].SectM.length; j++) {
-        var lowprices = await API.graphql(
-          graphqlOperation(lowest, {
-            CIndex: Full[n],
-          })
-        );
-        console.log('jo', lowprices.data.listlowestprice.items[0]);
-        Comb.concat(lowprices.data.listlowestprice.items[0]);
-        Comb.push(json[i].SectM[j], lowprices.data.listlowestprice.items[0]);
-        Comb = Object.assign([], ...Comb);
-        SectMN.push(Comb);
-        Comb = [];
-        n = n + 1;
-      }
-      console.log('iw', SectMN);
-    }
-
-    console.log('yis', Fin);
-  } catch (err) {
-    console.log('error creating restaurant...', err);
-  }
-};
-const renderItem = ({ item, index }) => {
-  let items = [];
-  if (item.SectM) {
-    items = item.SectM.map(row => {
-      indi = row.Index;
-
-      return (
-        <View style={styles.classes}>
-          {row.Index === null ? (
-            <View style={{ flex: 10 }}>
-              <Text style={styles.noSection}>All sections are open</Text>
-              <Text style={styles.noSection}>register on WebReg</Text>
-            </View>
-          ) : (
-            <TouchableOpacity
-              onPress={() =>
-                props.navigation.navigate('BuyClassInfo', {
-                  index: row.Index,
-                  teacher: row.Teacher,
-                  section: row.Sect,
-                  day1: row.Day1,
-                  time1: row.Time1,
-                  day2: row.Day2,
-                  time2: row.Time2,
-                  time4: row.Time4,
-                  time5: row.Time5,
-                  day3: row.Day3,
-                  day4: row.Day4,
-                  day5: row.Day5,
-                  time3: row.Time3,
-                  classname: item.ClassName,
-                  classmajor: item.Major,
-                  classnum: item.CourseID,
-                })
-              }>
-              <View style={styles.classboxes}>
-                <Text style={styles.classteach}>Prof: {row.Teacher}</Text>
-
-                <Text style={styles.classdate}>
-                  {row.Day1} {row.Time1}
-                </Text>
-                <Text style={styles.classdate}>
-                  {row.Day2} {row.Time2}
-                </Text>
-                  <Text style={styles.classind}>Index: {row.Index}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-          <View>
-            {lowprices.map((dank, index) => (
-              <View key={index}>
-                <Text> {dank.Price}</Text>
-              </View>
-            ))}
-          </View>
-          <View style={styles.sellprice} />
-        </View>
+  const GetfetchData = async () => {
+    try {
+      const response = await fetch(
+        `https://rutgersnmajors.s3.amazonaws.com/Major${
+          props.navigation.state.params.major
+        }.json`
       );
-    });
-  }
+      const json = await response.json();
+      setData(json)
+    } catch (err) {
+      console.log('error In BuyClassSection yis...', err);
+    }
+  };
 
-  return (
-    <View style={styles.background}>
-      <Collapse>
-        <CollapseHeader>
-          <View style={styles.classnamesbox}>
-            <Text style={styles.classnamestext}>{item.ClassName}</Text>
+ const renderItem = ({ item }) => {
+    let items = [];
+    if (item.SectM) {
+      items = item.SectM.map(row => {
+        indi = row.Index;
+
+        return (
+          <View style={styles.classes}>
+            {row.Index === null ? (
+              <View style={{ flex: 10 }}>
+                <Text style={styles.noSection}>All sections are open</Text>
+                <Text style={styles.noSection}>register on WebReg</Text>
+              </View>
+            ) : (
+              <TouchableOpacity
+                onPress={() =>
+                  props.navigation.navigate('BuyClassInfo', {
+                    index: row.Index,
+                    teacher: row.Teacher,
+                    section: row.Sect,
+                    day1: row.Day1,
+                    time1: row.Time1,
+                    day2: row.Day2,
+                    time2: row.Time2,
+                    time4: row.Time4,
+                    time5: row.Time5,
+                    day3: row.Day3,
+                    day4: row.Day4, 
+                    day5: row.Day5,
+                    time3: row.Time3,
+                    classname: item.ClassName,
+                    classmajor: item.Major,
+                    classnum: item.CourseID,
+                  })
+                }>
+                <View style={styles.classboxes}>
+                  <Text style={styles.classteach}>Prof: {row.Teacher}</Text>
+
+                  <Text style={styles.classdate}>
+                    {row.Day1} {row.Time1}
+                  </Text>
+                  <Text style={styles.classdate}>
+                    {row.Day2} {row.Time2}
+                  </Text>
+                    <Text style={styles.classind}>Index: {row.Index}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
           </View>
-        </CollapseHeader>
-        <CollapseBody>{items}</CollapseBody>
-      </Collapse>
-    </View>
-  );
-};
-props.navigation.getParam({ major: 'major' });
-return (
-  <View style={styles.container}>
-    <ScrollView>
-      <FlatList
-        style={styles.container}
-        data={data}
-        renderItem={renderItem()}
-        keyExtractor={extractKey}
-        refreshControl={
-          <RefreshControl
-            onRefresh={() => handleRefresh}
-            refreshing={refreshing}
+        );
+      });
+    }
+
+    return (
+      <View style={styles.background}>
+        <Collapse>
+          <CollapseHeader>
+            <View style={styles.classnamesbox}>
+              <Text style={styles.classnamestext}>{item.ClassName}</Text>
+            </View>
+          </CollapseHeader>
+          <CollapseBody>{items}</CollapseBody>
+        </Collapse>
+      </View>
+    );
+  };
+    props.navigation.getParam({ major: 'major' });
+    return (
+      <View style={styles.container}>
+        <ScrollView>
+          <FlatList
+            style={styles.container}
+            data={data}
+            renderItem={(info) => renderItem(info)}
+            keyExtractor={extractKey}
+            refreshControl={
+              <RefreshControl
+                onRefresh={() => handleRefresh()}/>
+            }
           />
-        }
-      />
-      <View style={styles.empty} />
-    </ScrollView>
-  </View>
-);
+          <View style={styles.empty} />
+        </ScrollView>
+      </View>
+    );
 }
-
-export default BuyClassSections
-// export default class BuyClassSections extends Component {
-//   state = {
-//     data: [],
-//     SectM: [],
-//     lowprices: [],
-//     ind: indi,
-//   };
-
-//   componentWillMount() {
-//     this.fetchData();
-//     this.lowprices();
-//     Analytics.record({majort: this.props.navigation.state.params.major})
-//     Analytics.record(this.props.navigation.state.params.major)
-//   }
-// recordfunc(){
-//   Analytics.record(this.props.navigation.state.params.major)
-// }
-//   lowprices = async () => {
-//     try {
-//       const lowprices = await API.graphql(
-//         graphqlOperation(lowest, {
-//           CIndex: getPrice,
-//         })
-//       );
-//       this.setState({ lowprices: lowprices.data.listlowestprice.items });
-//       console.log('success');
-//     } catch (err) {
-//       console.log('error creating ', err);
-//     }
-//   };
-//   fetchData = async () => {
-//     var i = null;
-//     var getPrice = null;
-//     var allP = [];
-//     try {
-//       const response = await fetch(
-//         `https://rutgersnmajors.s3.amazonaws.com/Major${
-//           this.props.navigation.state.params.major
-//         }.json`
-//       );
-//       const json = await response.json();
-//       this.setState({ data: json });
-//       var Full = [];
-//       var j = 0;
-//       for (i = 0; i < json.length; i++) {
-//         for (j = 0; j < json[i].SectM.length; j++) {
-//           Full.push(json[i].SectM[j].Index);
-//         }
-//       }
-//       var SectMN = [];
-//       var Comb = [];
-//       var n = 0;
-//       var Fin = [];
-//       var ClassP = [];
-//       var ClassNN = [];
-//       var CourseIDN = [];
-//       var MajorN = [];
-
-//       for (i = 0; i < json.length; i++) {
-//         for (j = 0; j < json[i].SectM.length; j++) {
-//           var lowprices = await API.graphql(
-//             graphqlOperation(lowest, {
-//               CIndex: Full[n],
-//             })
-//           );
-//           console.log('jo', lowprices.data.listlowestprice.items[0]);
-//           Comb.concat(lowprices.data.listlowestprice.items[0]);
-//           Comb.push(json[i].SectM[j], lowprices.data.listlowestprice.items[0]);
-//           Comb = Object.assign([], ...Comb);
-//           SectMN.push(Comb);
-//           Comb = [];
-//           n = n + 1;
-//         }
-//         console.log('iw', SectMN);
-//       }
-
-//       console.log('yis', Fin);
-//     } catch (err) {
-//       console.log('error creating restaurant...', err);
-//     }
-//   };
-
-//   renderItem = ({ item, index }) => {
-//     let items = [];
-//     if (item.SectM) {
-//       items = item.SectM.map(row => {
-//         indi = row.Index;
-
-//         return (
-//           <View style={styles.classes}>
-//             {row.Index === null ? (
-//               <View style={{ flex: 10 }}>
-//                 <Text style={styles.noSection}>All sections are open</Text>
-//                 <Text style={styles.noSection}>register on WebReg</Text>
-//               </View>
-//             ) : (
-//               <TouchableOpacity
-//                 onPress={() =>
-//                   this.props.navigation.navigate('BuyClassInfo', {
-//                     index: row.Index,
-//                     teacher: row.Teacher,
-//                     section: row.Sect,
-//                     day1: row.Day1,
-//                     time1: row.Time1,
-//                     day2: row.Day2,
-//                     time2: row.Time2,
-//                     time4: row.Time4,
-//                     time5: row.Time5,
-//                     day3: row.Day3,
-//                     day4: row.Day4,
-//                     day5: row.Day5,
-//                     time3: row.Time3,
-//                     classname: item.ClassName,
-//                     classmajor: item.Major,
-//                     classnum: item.CourseID,
-//                   })
-//                 }>
-//                 <View style={styles.classboxes}>
-//                   <Text style={styles.classteach}>Prof: {row.Teacher}</Text>
-
-//                   <Text style={styles.classdate}>
-//                     {row.Day1} {row.Time1}
-//                   </Text>
-//                   <Text style={styles.classdate}>
-//                     {row.Day2} {row.Time2}
-//                   </Text>
-//                     <Text style={styles.classind}>Index: {row.Index}</Text>
-//                 </View>
-//               </TouchableOpacity>
-//             )}
-//             <View>
-//               {this.state.lowprices.map((dank, index) => (
-//                 <View key={index}>
-//                   <Text> {dank.Price}</Text>
-//                 </View>
-//               ))}
-//             </View>
-//             <View style={styles.sellprice} />
-//           </View>
-//         );
-//       });
-//     }
-
-//     return (
-//       <View style={styles.background}>
-//         <Collapse>
-//           <CollapseHeader>
-//             <View style={styles.classnamesbox}>
-//               <Text style={styles.classnamestext}>{item.ClassName}</Text>
-//             </View>
-//           </CollapseHeader>
-//           <CollapseBody>{items}</CollapseBody>
-//         </Collapse>
-//       </View>
-//     );
-//   };
-//   render() {
-//     this.props.navigation.getParam({ major: 'major' });
-
-//     return (
-//       <View style={styles.container}>
-//         <ScrollView>
-//           <FlatList
-//             style={styles.container}
-//             data={this.state.data}
-//             renderItem={this.renderItem}
-//             keyExtractor={extractKey}
-//             refreshControl={
-//               <RefreshControl
-//                 onRefresh={() => this.handleRefresh}
-//                 refreshing={this.state.refreshing}
-//               />
-//             }
-//           />
-//           <View style={styles.empty} />
-//         </ScrollView>
-//       </View>
-//     );
-//   }
-// }
 
 const styles = EStyleSheet.create({
   container: {

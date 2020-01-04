@@ -1,25 +1,18 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
-  StyleSheet,
-  Button,
   TouchableWithoutFeedback,
   Keyboard,
   Text,
   TouchableOpacity,
   Linking,
-  Input,
   TextInput,
-  Switch,
   Alert,
   Dimensions,
 } from 'react-native';
 import DropdownAlert from 'react-native-dropdownalert';
 
-import { withAuthenticator } from 'aws-amplify-react-native';
 import { API, graphqlOperation } from 'aws-amplify';
-// import t from 'tcomb-form-native';
-import gql from 'graphql-tag';
 import EStyleSheet from 'react-native-extended-stylesheet';
 import { AsyncStorage } from '@aws-amplify/core';
 const entireScreenWidth = Dimensions.get('window').width;
@@ -32,14 +25,6 @@ const DismissKeyboard = ({ children }) => (
     {children}
   </TouchableWithoutFeedback>
 );
-
-// const createLoginModal = `query GettingNetIDCred($userNetID: String, $passNetID:String){ listNetIDCred(Type: "LoginTest", userNetID: $userNetID, passNetID:$passNetID) {
-//   result{
-//     ClassNum
-//     ClassName
-//   }
-// }}
-// `;
 
 const netidCheck = `query Checknetd($userNetID: String){
   listLoginModals(Type:"Login", limit:1, userNetID:$userNetID){
@@ -55,7 +40,18 @@ const LoginCheck = `mutation updatelogintime($userNetID: String, $passNetID: Str
   message
   errorMessage}
 }}`;
-export default class RUIDLogin extends Component {
+export default RUIDLogin = () => {
+
+  const [NetID, setNetID] = useState('')
+  const [Password, setPassword] = useState('')
+  const [netidcheck, setNetidcheck] = useState([])
+  const [schedinfo, setSchedinfo] = useState([])
+  const [userNetID, setUserNetID] = useState('')
+  const [passNetID, setPassNetID] = useState('')
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [wasShown, setWasShown] = useState(false)
+  const [Username, setUsername] = useState('')
+
   state = {
     NetID: '',
     Name: '',
@@ -71,61 +67,59 @@ export default class RUIDLogin extends Component {
     isLoaded: false,
       wasShown: false
   };
-  //  componentDidMount() {
-  //     this.queryData();
-  //   }
-  componentDidMount() {
+
+  useEffect(() => {
     AsyncStorage.getItem('key')
-      .then(wasShown => {
-          if(wasShown === null) {  
-            AsyncStorage.setItem('key', '"true"')
-          }
- 
-          this.setState({isLoaded: true, wasShown})
-       })
-   }
-  queryData = async () => {
+    .then(wasShown => {
+        if(wasShown === null) {  
+          AsyncStorage.setItem('key', '"true"')
+        }
+        setIsLoaded(true)
+        setWasShown(true)
+      })
+  }, [])
+
+  const queryData = async () => {
     try {
       const netidcheck = await API.graphql(graphqlOperation(netidCheck));
-      this.setState({ netidcheck: netidcheck.data.listLoginModals.items });
+      setNetID(netidcheck.data.listLoginModals.items)
     } catch (err) {
       console.log('error creating restaurant...', err);
     }
   };
-  setuser = async () => {
-    const {Username, Password} = this.state;
- let  value = Username;
- let valuep = Password;
- try {
-   await AsyncStorage.setItem('Username', value);
-   this.setState({ 'Username': value });  
-   await AsyncStorage.setItem('Password', valuep);
-   this.setState({ 'Password': valuep }); 
-   console.log(value) 
-       console.log(valuep) 
-       Alert.alert("succesful login")
- } catch (error) {
-   console.log('error saving data')
- }
-};
-  CreateLoginCheck = async () => {
+//   const setuser = async () => {
+//  let value = Username;
+//  let valuep = Password;
+//  try {
+//    await AsyncStorage.setItem('Username', value);
+
+//    this.setState({ 'Username': value });  
+//    await AsyncStorage.setItem('Password', valuep);
+//    this.setState({ 'Password': valuep }); 
+//    console.log(value) 
+//        console.log(valuep) 
+//        Alert.alert("succesful login")
+//  } catch (error) {
+//    console.log('error saving data')
+//  }
+// };
+  const CreateLoginCheck = async () => {
     try {
       await API.graphql(
         graphqlOperation(LoginCheck, {
-          userNetID: this.state.userNetID,
-          passNetID: this.state.passNetID,
+          userNetID: userNetID,
+          passNetID: passNetID,
         })
       );
-      console.log('item created!');
-      const netidcheck = await API.graphql(graphqlOperation(netidCheck, {userNetID: this.state.userNetID}));
-      this.setState({ netidcheck: netidcheck.data.listLoginModals.items });
-      this.dropDownAlertRef.alertWithType(
+      const Getnetidcheck = await API.graphql(graphqlOperation(netidCheck, {userNetID: userNetID}));
+      setNetidcheck(Getnetidcheck.data.listLoginModals.items)
+      dropDownAlertRef.alertWithType(
         'success',
         'Success',
         'Sign In Successful'
       );
     } catch (err) {
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
         err.errors[0].message
@@ -133,95 +127,37 @@ export default class RUIDLogin extends Component {
     }
   };
 
-  // CreateUser = async () => {
-  //   const { userNetID, passNetID } = this.state;
-  //   if (userNetID === '') return;
-  //   let login = { userNetID };
-  //   if (passNetID !== '') {
-  //     login = { ...login, passNetID };
-  //   }
-  //   const updatedLoginArray = [...this.state.logins, login];
-  //   this.setState({ logins: updatedLoginArray });
-  //   try {
-  //     await API.graphql(graphqlOperation(createLoginModal, login));
-  //     console.log('item created!');
-  //   } catch (err) {
-  //     console.log('error creating login...', err);
-  //   }
-  // };
 
-  // change state then user types into input
-  onChange = (key, value) => {
-    this.setState({ [key]: value });
-  };
-  // this.props.navigation.navigate('HomeScreen');
-  // componentDidMount() {
-  //   AsyncStorage.getItem(this.props.pagekey, (err, result) => {
-  //     if (err) {
-  //     } else {
-  //       if (result == null) {
-  //         console.log("null value recieved", result);
-  //       } else {
-  //         this.props.navigation.navigate('SchedScreen')
-  //       }
-  //     }    
-  //   });
-  //   AsyncStorage.setItem(this.props.pagekey, JSON.stringify({"value":"true"}), (err,result) => {
-  //           console.log("error");
-  //           });
-  // }
-  setModalVisible(visible) {
-    this.setState({ modalVisible: visible });
-  }
-  onClickab() {
-    this.CreateLoginCheck();
-    this._onDone();
-    // this.queryData();
-  }
-  _onDone = async () => {
-    const {userNetID, passNetID} = this.state;
- let  value = userNetID;
- let valuep = passNetID;
- try {
-   await AsyncStorage.setItem('userNetID', value);
-   this.setState({ 'userNetID': value });  
-   await AsyncStorage.setItem('passNetID', valuep);
-   this.setState({ 'passNetID': valuep }); 
-   console.log(value) 
-       console.log(valuep) 
-       this.dropDownAlertRef.alertWithType(
-        'success',
-        'Success',
-        'Attempting to Sign In'
-      );
- } catch (error) {
-   console.log('error saving data')
- }
-  };
-  // async componentDidMount() {
-  //   const names = await API.graphql(
-  //     graphqlOperation(getLoginModal, {
-  //       NetID: this.state.userNetID,
-  //       Password: this.state.passNetID,
-  //     })
-  //   );
-  //   this.setState({
-  //     names: names.data.getLoginModal.items, 
-  //   });
-  // } 
-  catch(err) {
-    console.log('error fetching names...', err);
-  }
 
-  render() {
+  const onClickab = () => {
+    CreateLoginCheck();
+    _onDone();
+  }
+  const _onDone = async () => {
+  let value = userNetID;
+  let valuep = passNetID;
+  try {
+    await AsyncStorage.setItem('userNetID', value);
+    setUserNetID(value)
+    await AsyncStorage.setItem('passNetID', valuep);
+    setPassNetID(valuep)
+    dropDownAlertRef.alertWithType(
+      'success',
+      'Success',
+      'Attempting to Sign In'
+    );
+  } catch (error) {
+    console.log('error saving data')
+  }
+};
     return ( <DismissKeyboard>
       <View>
         <View style={styles.container}>
           <Text style={styles.titletext}>Enter Your Net ID Login</Text>
           <View style={styles.textinput}>
           <TextInput
-            onChangeText={v => this.onChange('userNetID', v)}
-            value={this.state.userNetID}
+            onChangeText={v => setUserNetID(v)}
+            value={userNetID}
             placeholderTextColor="#D3D3D3"
             placeholder="Enter your Net ID "
             autoCapitalize='none'
@@ -230,8 +166,8 @@ export default class RUIDLogin extends Component {
           </View>
           <View  style={styles.textinput}>
           <TextInput
-            onChangeText={v => this.onChange('passNetID', v)}
-            value={this.state.passNetID}
+            onChangeText={v => setPassNetID(v)}
+            value={passNetID}
             placeholderTextColor="#D3D3D3"
             placeholder="Enter your Net ID Password "
             autoCapitalize='none'
@@ -255,28 +191,25 @@ export default class RUIDLogin extends Component {
                   Alert.alert('Wrong netID or password provided')
                 ) : dat.userNetID === null ? (
                   Alert.alert('Wrong netID or password provided')
-                ) : (this.props.navigation.navigate('loadSIpage') )}
+                ) : (props.navigation.navigate('loadSIpage') )}
                 <Text>{dat.usernetID}</Text>
               </View>
             ))}
             <TouchableOpacity
               style={styles.button}
               disabled={
-                this.state.userNetID.length === 0 ||
-                this.state.passNetID.length === 0
+                userNetID.length === 0 ||
+                passNetID.length === 0
               }
-              onPress={() => {
-                this.onClickab();
-              }}>
+              onPress={() => onClickab()}>
               <Text style={styles.buttontext}>Sign In!</Text>
             </TouchableOpacity>
           </View>
         </View> 
-        <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
+        <DropdownAlert ref={ref => (dropDownAlertRef = ref)} />
       </View>
     </DismissKeyboard>
     )
-}
 }
 const styles = EStyleSheet.create({
   container: {
@@ -320,7 +253,6 @@ justifyContent:'center',
     height: '50rem',
     width: '90%',
     backgroundColor: 'orange',
-    //backgroundColor: '#44aafc',
     borderRadius: '5rem',
     alignItems: 'center',
     justifyContent: 'center',

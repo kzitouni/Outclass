@@ -1,4 +1,4 @@
-import * as React from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   Text,
   View,
@@ -47,272 +47,263 @@ const DismissKeyboard = ({ children }) => (
     {children}
   </TouchableWithoutFeedback>
 );
-export default class PaypalPayout extends React.Component {
-  componentWillMount() {
-    this.netID();
-    this.props.navigation.getParam({ funds: 'funds' });
-  }
-  netID = async () => {
+const PaypalPayout = (props) => {
+  // const [NetID, setNetID] = useState('')
+  // const [passNetID, setpassNetID] = useState('')
+  // const [userNetID, setuserNetID] = useState('')
+  // const [Name, setName] = useState('')
+  const [Phone, setPhone] = useState('')
+  const [confirmPhone, setConfirmPhone] = useState('')
+  const [email, setEmail] = useState('')
+  const [confirmEmail, setConfirmEmail] = useState('')
+  // const [Terms, setTerms] = useState('')
+  // const [logins, setLogins] = useState('')
+  const [netID, setnetID] = useState([])
+  const [buttonColor, setButtonColor] = useState('#D3D3D3')
+  const [buttonColor1, setButtonColor1] = useState('#D3D3D3')
+  const [type, setType] = useState('')
+  const [content, setContent] = useState('false')
+  const [disable, setDisable] = useState(false)
+
+   useEffect(() => {
+    getnetID()
+    props.navigation.getParam({funds: 'funds'})
+  }, [])
+  const getnetID = async () => {
     try {
       const netID = await API.graphql(graphqlOperation(netid, {
-        userNetID: this.props.navigation.state.params.use
+        userNetID: props.navigation.state.params.use
       }));
-      this.setState({ netID: netID.data.listLoginModals.items });
+      setnetID(netID.data.listLoginModals.items)
     } catch (err) {
       console.log('error creating restaurant...', err);
     }
   };
-  state = {
-    NetID: '',
-    passNetID: '',
-    userNetID: '',
-    Name: '',
-    Phone: '',
-    confirmPhone: '',
-    email: '',
-    confirmEmail: '',
-    Terms: '',
-    logins: '',
-    names: [],
-    netID: [],
-    buttonColor: '#D3D3D3',
-    buttonColor1: '#D3D3D3',
-    type: '',
-    content: 'false',
-    disable: false
-  };
-  paypalphone = async () => {
+  const paypalphone = async () => {
     try {
       const paypalphone = await API.graphql(
         graphqlOperation(paypalpayout, {
           type: "PHONE",
-          contact: this.state.Phone,
-          userNetID: this.props.navigation.state.params.use
+          contact: Phone,
+          userNetID: props.navigation.state.params.use
         })
       );
       console.log('success');
-      this.dropDownAlertRef.alertWithType('success', 'Phone Payout went through');
+      dropDownAlertRef.alertWithType('success', 'Phone Payout went through');
     } catch (err) {
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
       );
       console.log('error creating ', err);
     }
   };
-  paypalemail = async () => {
+  const paypalemail = async () => {
     try {
       const paypalemail = await API.graphql(
         graphqlOperation(paypalpayout, {
           type: "EMAIL",
-          contact: this.state.email,
-          userNetID: this.props.navigation.state.params.use
+          contact: email,
+          userNetID: props.navigation.state.params.use
         })
       );
       console.log('success');
-      this.dropDownAlertRef.alertWithType('success', 'Email Payout went through');
+      dropDownAlertRef.alertWithType('success', 'Email Payout went through');
     } catch (err) {
-      this.dropDownAlertRef.alertWithType(
+      dropDownAlertRef.alertWithType(
         'error',
         'Error',
       );
       console.log('error creating ', err);
     }
   };
-  handleSubmit = () => {
-    const { Phone, confirmPhone } = this.state;
-    // perform all neccassary validations
+  const handleSubmit = () => {
     if (Phone !== confirmPhone) {
       alert("Phones don't match");
     } else {
-      this.paypalphone();
+      paypalphone();
     }
   };
-  handleEmailSubmit = () => {
-    const { email, confirmEmail } = this.state;
-    // perform all neccassary validations
+  const handleEmailSubmit = () => {
     if (email !== confirmEmail) {
       alert("Email's don't match");
     } else {
-      this.paypalemail();
+      paypalemail();
     }
   };
-  onButtonPress = () => {
-    this.setState({ buttonColor: '#44aafc' });
-    this.setState({ buttonColor1: '#D3D3D3' });
-    this.setState({ type: 'EMAIL' });
-    this.componentHideAndShow();
+  const onButtonPress = () => {
+    setButtonColor('#44aafc')
+    setButtonColor1('#D3D3D3')
+    setType('EMAIL')
+    componentHideAndShow();
   };
-  onButtonPress1 = () => {
-    this.setState({ buttonColor: '#D3D3D3' });
-    this.setState({ buttonColor1: '#44aafc' });
-    this.setState({ type: 'PHONE' });
+  const onButtonPress1 = () => {
+    setButtonColor('#D3D3D3')
+    setButtonColor1('#44aafc')
+    setType('PHONE')
   };
-  componentHideAndShow = () => {
-    this.setState(previousState => ({ content: !previousState.content }));
+  const componentHideAndShow = () => {
+    setContent(prevState => !prevState.content)
   };
-  render() { 
-    const { navigation } = this.props;
-    const use = navigation.getParam('use', ' ');
-    return (
+
+  return (  
       
-      <KeyboardAvoidingView style={{flex:1}} behavior="padding" enabled>  
-      <ScrollView>
-      <View style={styles.container}>
-        <View style={styles.imageCont}>
-          <Image
-            style={styles.image}
-            source={{
-              uri: 'https://tutorialscreen2.s3.amazonaws.com/PaypalLogo.jpg',
-            }}
-          />
-          <Image
-            style={styles.image}
-            source={{
-              uri: 'https://tutorialscreen2.s3.amazonaws.com/GPayLogo.jpg',
-            }}
-          />
-        </View>
-        
-          <DismissKeyboard> 
-            <View style={{ width: '100%', alignItems: 'center' }}>
-              <View style={styles.currearnCont}>
-                <Text style={styles.currEarnText}>Payout Total:</Text>
-                {this.state.netID.map(dat => ( 
-                  <View item={dat} key={dat.id}> 
-                    <Text style={styles.currEarnText}>${dat.Funds} </Text> 
-                    {dat.Funds == null || dat.Funds == 0 || dat.Funds == '0' || dat.Funds == ' ' || typeof dat.Funds == undefined ? 
-                  this.setState.disable == true : null}
-                  </View>
-                ))}
-               
-              </View>
-              <View style={styles.payOutTCont}>
-                <Text style={styles.payOutTxtM}>*Important Message</Text> 
-                <Text style={styles.payOutTxt}>
-                  {
-                    "Once payment is sent you have 14 days to claim it or it will be returned. This is Google Pay's Policy"
-                  }
-                </Text>
-              </View>
-              <View style={styles.payOutCont}>
-                <TouchableOpacity
-                  style={styles.leftbutton}
-                  onPress={() => {
-                    this.onButtonPress();
-                  }}>
-                  <View
-                    style={styles.phonecont}
-                    backgroundColor={this.state.buttonColor}>
-                    <Text style={styles.buttontext}>Phone Number</Text>
-                  </View>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={styles.button}
-                  
-                  onPress={() => {
-                    this.onButtonPress1();
-                  }}>
-                  <View
-                    style={styles.emailcont}
-                    backgroundColor={this.state.buttonColor1}>
-                    <Text style={styles.buttontext}>Email</Text>
-                  </View>
-                </TouchableOpacity>
-              </View>
-
-              {this.state.buttonColor == '#44aafc' ? (
-                <View>
-                  <View style={styles.phonetxtcont}>
-                    <TextInputMask
-                      type={'custom'}
-                      options={{
-                        mask: '999 999 9999',
-                      }}
-                      keyboardType="phone-pad"
-                      placeholder="Phone Number"
-                      maxLength="12"
-                      value={this.state.Phone}
-                      style={styles.phonetxtinput}
-                      onChangeText={Phone => this.setState({ Phone })}
-                    />
-                  </View>
-                  <View style={styles.phonetxtcont}>
-                    <TextInputMask
-                      type={'custom'}
-                      options={{
-                        mask: '999 999 9999',
-                      }}
-                      keyboardType="phone-pad"
-                      placeholder="Confirm Phone Number"
-                      maxLength="12"
-                      value={this.state.confirmPhone}
-                      style={styles.phonetxtinput}
-                      onChangeText={confirmPhone =>
-                        this.setState({ confirmPhone })
-                      }
-                    />
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      style={styles.submitbutton}
-                      disabled={this.state.Phone.length === 0}
-                      onPress={() => {
-                        this.handleSubmit();
-                      }}>
-                      <View style={styles.submitcont} backgroundColor="orange">
-                        <Text style={styles.buttontext}>Submit</Text>
-                      </View>
-                    </TouchableOpacity>
-                    <View style={styles.empty} />
-                  </View>
+    <KeyboardAvoidingView style={{flex:1}} behavior="padding" enabled>  
+    <ScrollView>
+    <View style={styles.container}>
+      <View style={styles.imageCont}>
+        <Image
+          style={styles.image}
+          source={{
+            uri: 'https://tutorialscreen2.s3.amazonaws.com/PaypalLogo.jpg',
+          }}
+        />
+        <Image
+          style={styles.image}
+          source={{
+            uri: 'https://tutorialscreen2.s3.amazonaws.com/GPayLogo.jpg',
+          }}
+        />
+      </View>
+      
+        <DismissKeyboard> 
+          <View style={{ width: '100%', alignItems: 'center' }}>
+            <View style={styles.currearnCont}>
+              <Text style={styles.currEarnText}>Payout Total:</Text>
+              {netID.map(dat => ( 
+                <View item={dat} key={dat.id}> 
+                  <Text style={styles.currEarnText}>${dat.Funds} </Text> 
+                  {dat.Funds == null || dat.Funds == 0 || dat.Funds == '0' || dat.Funds == ' ' || typeof dat.Funds == undefined ? 
+                setDisable == true : null}
                 </View>
-              ) : this.state.buttonColor1 == '#44aafc' ? (
-                <View>
-                  <View style={styles.textinputview}>
-                    <TextInput
-                      placeholder="Email"
-                      value={this.state.text}
-                      style={styles.emailinput}
-                      onChangeText={email => this.setState({ email })}
-                    />
-                  </View>
-                  <View style={styles.phonetxtcont}>
-                    <TextInput
-                      placeholder="Confirm Email "
-                      value={this.state.text}
-                      style={styles.emailinput}
-                      onChangeText={confirmEmail =>
-                        this.setState({ confirmEmail })
-                      }
-                    />
-                  </View>
-                  <View>
-                    <TouchableOpacity
-                      style={styles.submitbutton}
-                      disabled={this.state.email.length == 0 || this.state.Phone.length == 0 || this.state.disable == true}
-                      onPress={() => {
-                        this.handleEmailSubmit();
-                      }}>
-                      <View style={styles.submitcont} backgroundColor="orange">
-                        <Text style={styles.buttontext}>Submit</Text>
-                      </View>
-                    </TouchableOpacity>
-                    <View style={styles.empty} />
-                  </View>
-                </View>
-              ) : null}
-                        <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
-
+              ))}
+             
             </View>
-          </DismissKeyboard>
+            <View style={styles.payOutTCont}>
+              <Text style={styles.payOutTxtM}>*Important Message</Text> 
+              <Text style={styles.payOutTxt}>
+                {
+                  "Once payment is sent you have 14 days to claim it or it will be returned. This is Google Pay's Policy"
+                }
+              </Text>
+            </View>
+            <View style={styles.payOutCont}>
+              <TouchableOpacity
+                style={styles.leftbutton}
+                onPress={() => {
+                  onButtonPress();
+                }}>
+                <View
+                  style={styles.phonecont}
+                  backgroundColor={buttonColor}>
+                  <Text style={styles.buttontext}>Phone Number</Text>
+                </View>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.button}
+                
+                onPress={() => {
+                  onButtonPress1();
+                }}>
+                <View
+                  style={styles.emailcont}
+                  backgroundColor={buttonColor1}>
+                  <Text style={styles.buttontext}>Email</Text>
+                </View>
+              </TouchableOpacity>
+            </View>
+
+            {buttonColor == '#44aafc' ? (
+              <View>
+                <View style={styles.phonetxtcont}>
+                  <TextInputMask
+                    type={'custom'}
+                    options={{
+                      mask: '999 999 9999',
+                    }}
+                    keyboardType="phone-pad"
+                    placeholder="Phone Number"
+                    value={Phone}
+                    style={styles.phonetxtinput}
+                    onChangeText={Phone => setPhone(Phone)}
+                  />
+                </View>
+                <View style={styles.phonetxtcont}>
+                  <TextInputMask
+                    type={'custom'}
+                    options={{
+                      mask: '999 999 9999',
+                    }}
+                    keyboardType="phone-pad"
+                    placeholder="Confirm Phone Number"
+                    value={confirmPhone}
+                    style={styles.phonetxtinput}
+                    onChangeText={confirmPhone =>
+                      setConfirmPhone(confirmPhone)
+                    }
+                  />
+                </View>
+                <View>
+                  <TouchableOpacity
+                    style={styles.submitbutton}
+                    disabled={Phone.length === 0}
+                    onPress={() => {
+                     handleSubmit();
+                    }}>
+                    <View style={styles.submitcont} backgroundColor="orange">
+                      <Text style={styles.buttontext}>Submit</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.empty} />
+                </View>
+              </View>
+            ) : buttonColor1 == '#44aafc' ? (
+              <View>
+                <View style={styles.textinputview}>
+                  <TextInput
+                    placeholder="Email"
+                    value={email}
+                    style={styles.emailinput}
+                    onChangeText={email => setEmail(email) }
+                  />
+                </View>
+                <View style={styles.phonetxtcont}>
+                  <TextInput
+                    placeholder="Confirm Email "
+                    value={confirmEmail}
+                    style={styles.emailinput}
+                    onChangeText={confirmEmail =>
+                      setConfirmEmail(confirmEmail)
+                    }
+                  />
+                </View>
+                <View>
+                  <TouchableOpacity
+                    style={styles.submitbutton}
+                    disabled={email.length == 0 || Phone.length == 0 || disable == true}
+                    onPress={() => {
+                      handleEmailSubmit();
+                    }}>
+                    <View style={styles.submitcont} backgroundColor="orange">
+                      <Text style={styles.buttontext}>Submit</Text>
+                    </View>
+                  </TouchableOpacity>
+                  <View style={styles.empty} />
+                </View>
+              </View>
+            ) : null}
+                      <DropdownAlert ref={ref => (dropDownAlertRef = ref)} />
+
           </View>
-          </ScrollView>
-          <DropdownAlert ref={ref => (this.dropDownAlertRef = ref)} />
-      </KeyboardAvoidingView>
-    );
-  }
+        </DismissKeyboard>
+        </View>
+        </ScrollView>
+        <DropdownAlert ref={ref => (dropDownAlertRef = ref)} />
+    </KeyboardAvoidingView>
+  );
+
 }
+export default PaypalPayout
 
 const styles = EStyleSheet.create({
   container: {
@@ -390,7 +381,6 @@ const styles = EStyleSheet.create({
     justifyContent: 'center', 
     alignItems: 'center', 
     flexDirection: 'row', 
-    //backgroundColor:'pink', 
     height: '100rem',     
     width: '100%',  
   },
@@ -416,7 +406,6 @@ const styles = EStyleSheet.create({
     height: '50rem',
     width: '30%',
     marginRight: '15%',
-    // backgroundColor: 'pink',
     borderRadius: '10rem',
     alignItems: 'center',
     justifyContent: 'center',
@@ -426,7 +415,6 @@ const styles = EStyleSheet.create({
     height: '50rem',
     width: '30%',
     backgroundColor: 'orange',
-    // backgroundColor: '#44aafc',
     borderRadius: '10rem',
     alignItems: 'center',
     justifyContent: 'center',
@@ -438,7 +426,6 @@ const styles = EStyleSheet.create({
     height: '50rem',
     width: '50%',
     backgroundColor: 'orange',
-    // backgroundColor: '#44aafc',
     borderRadius: '10rem',
     alignItems: 'center',
     justifyContent: 'center',
@@ -453,7 +440,6 @@ const styles = EStyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    //backgroundColor: 'blue',
   },
   currEarnText: {
     textAlign: 'center',
@@ -462,7 +448,6 @@ const styles = EStyleSheet.create({
     fontWeight: '700',
   },
   payOutTCont: {
-    //backgroundColor: 'yellow',
     width: '80%',
     alignItems: 'center',
     justifyContent: 'center',
@@ -488,7 +473,6 @@ const styles = EStyleSheet.create({
     marginTop: '35rem',
     borderRadius: '10rem',
     flexDirection: 'row',
-    // backgroundColor:'red'
   },
   payOutText: {
     fontSize: '20rem',
@@ -497,7 +481,6 @@ const styles = EStyleSheet.create({
     paddingRight: '10rem',
     borderRadius: '10rem',
     color: 'white',
-    // backgroundColor:'orange'
   },
   spacingView: {
     height: '7%',
