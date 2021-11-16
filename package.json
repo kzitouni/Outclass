@@ -15,7 +15,7 @@
     "aws-amplify-react-native": "^2.1.12",
     "aws-appsync": "^1.8.0",
     "aws-appsync-react": "^1.2.8",
-    "aws-sdk": "^2.480.0",
+    "aws-sdk": "^2.814.0",
     "create-react-class": "^15.6.3",
     "expo": "^34.0.1",
     "expo-cli": "^3.0.4",
