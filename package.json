@@ -18,7 +18,7 @@
     "aws-sdk": "^2.480.0",
     "create-react-class": "^15.6.3",
     "expo": "^34.0.1",
-    "expo-cli": "^3.0.4",
+    "expo-cli": "^6.0.8",
     "expo-stripe-checkout": "^1.0.1",
     "graphql": "^14.3.1",
     "graphql-tag": "^2.10.1",
